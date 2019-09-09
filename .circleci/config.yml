@@ -20,20 +20,11 @@ executors:
         environment:
           GO111MODULE: "on"
 
-commands:
-  install-make:
-    steps:
-      - run:
-          name: Install make
-          command: |
-            sudo apt-get update -y -q && sudo apt-get install -y make
-
 jobs:
   test:
     executor: default
     steps:
       - checkout
-      - install-make
       - <<: *restore_mod_cache
       - run:
           name: Cache go mod 
@@ -42,14 +33,13 @@ jobs:
       - run:
           name: Run test
           command: |
-            make test
+            go test ./...
       - <<: *save_mod_cache
   
   codecov:
     executor: default
     steps:
       - checkout
-      - install-make
       - run:
           name: Test race
           command: |
