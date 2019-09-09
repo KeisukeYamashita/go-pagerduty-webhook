@@ -131,6 +131,15 @@ type LogEntry struct {
 	EventDetails EventDetails `json:"event_details"`
 }
 
+// GetCreatedAt ...
+func (i *LogEntry) GetCreatedAt() (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, i.CreatedAt)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return t, nil
+}
+
 // Agent ...
 type Agent struct {
 	ID      string `json:"id"`
@@ -186,6 +195,15 @@ type Service struct {
 	Self                   string              `json:"self"`
 	HTMLURL                string              `json:"html_url"`
 	Metadata               Metadata            `json:"metadata"`
+}
+
+// GetCreatedAt ...
+func (i *Service) GetCreatedAt() (time.Time, error) {
+	t, err := time.Parse(time.RFC3339, i.CreatedAt)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return t, nil
 }
 
 // ImpactedService ...
