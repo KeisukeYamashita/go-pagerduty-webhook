@@ -1,0 +1,69 @@
+version: 2.1
+
+refs:
+  working_dir: &working_dir /go/src/github.com/KeisukeYamashita/go-pagerduty-webhook
+  restore_mod_cache: &restore_mod_cache
+    restore_cache:
+        keys:
+          - go-mod-v1-{{ checksum "go.mod" }}
+          - go-mod-v1-
+  save_mod_cache: &save_mod_cache
+    save_cache:
+        key: go-mod-v1-{{ checksum "go.mod" }}
+        paths:
+            - "/go/pkg/mod/cache"
+executors:
+  default:
+    working_directory: *working_dir
+    docker:
+      - image: circleci/golang:1.12
+        environment:
+          GO111MODULE: "on"
+
+commands:
+  install-make:
+    steps:
+      - run:
+          name: Install make
+          command: |
+            sudo apt-get update -y -q && sudo apt-get install -y make
+
+jobs:
+  test:
+    executor: default
+    steps:
+      - checkout
+      - install-make
+      - <<: *restore_mod_cache
+      - run:
+          name: Cache go mod 
+          command: |
+            go mod download
+      - run:
+          name: Run test
+          command: |
+            make test
+      - <<: *save_mod_cache
+  
+  codecov:
+    executor: default
+    steps:
+      - checkout
+      - install-make
+      - run:
+          name: Test race
+          command: |
+            go test ./... -coverprofile=coverage.txt -covermode=atomic
+      - run:
+          name: Report coverage
+          command: |
+            bash <(curl -s https://codecov.io/bash)
+
+workflows:
+  version: 2
+  test-and-codeenv:
+    jobs:
+      - test
+      - codecov:
+          requires:
+            - test

@@ -6,10 +6,7 @@
 package webhook
 
 import (
-	"errors"
 	"time"
-
-	"github.com/kouzoh/merpay-pagerduty-recorder/models"
 )
 
 // Payload is the top level of the HTTP request body
@@ -85,32 +82,6 @@ func (i *Incident) GetCreatedAt() (time.Time, error) {
 		return time.Time{}, err
 	}
 	return t, nil
-}
-
-// RetriveMetric ...
-func (msg *Message) RetriveMetric(event string, old *models.Incident) (string, time.Duration, error) {
-	newCreatedOn, err := msg.GetCreatedOn()
-	if err != nil {
-		return "", time.Duration(0), err
-	}
-
-	oldCreatedAt := old.TriggeredAt
-	if err != nil {
-		return "", time.Duration(0), err
-	}
-
-	var metricName string
-	switch event {
-	case IncidentAcknowledge:
-		metricName = "tta"
-	case IncidentResolve:
-		metricName = "ttr"
-	default:
-		return "", -1, errors.New("no a target metric")
-	}
-
-	duration := newCreatedOn.Sub(oldCreatedAt)
-	return metricName, duration, nil
 }
 
 // IncidentsResponder ...
