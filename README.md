@@ -20,7 +20,7 @@ func (ctr Controller) IncidentHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		var payload webhook.Payload
-		err = decoder.Decode(&payload)
+		_ = decoder.Decode(&payload)
     }
 }
 ```
